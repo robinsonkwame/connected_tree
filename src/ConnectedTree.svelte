@@ -7,13 +7,29 @@
   let offset = 100;
   let myref;
 
+  let lastLength = 0;
+
   const {
       nodesStore,
-      nodeIdSelected,
-      deleteNode
+      nodeIdSelected
     } = coreSvelvetStore;
   // from https://github.com/open-source-labs/Svelvet/NPM%20Package/svelvet/Nodes/EditModal.svelte
   $: currentNode = $nodesStore.filter(n => n.id === $nodeIdSelected)[0];
+
+  // retroactively add click handler to new nodes
+  // see issue 185
+  $: $nodesStore, (() => {
+    const currentLength = $nodesStore.length - 1;
+    const lastNode = $nodesStore[currentLength]
+
+    if (lastLength < currentLength){
+      lastLength = currentLength;
+      if(lastNode && !('clickCallback' in lastNode)){
+        lastNode['clickCallback'] = handleClick;
+        nodesStore.set($nodesStore); // EditModal.svelte:34 ???
+      }
+    }
+  })();
 
   function introspect(item){
     console.log('\t about to introspect')
@@ -36,7 +52,7 @@
     const currentNode = $nodesStore.filter(n => n.id === $nodeIdSelected)[0]
     'borderRadius' in currentNode ? 
       delete currentNode['borderRadius'] : currentNode['borderRadius'] = 550;
-    nodesStore.set($nodesStore); // EditModal.svelte:34 ???
+    nodesStore.set($nodesStore); // EditModal.svelte:34 ???    
   }
 
   const toggleShape = (e) => {
@@ -79,6 +95,8 @@
   nodes={initialNodes} 
   edges={initialEdges}
   nodeEdit
+	nodeLink 
+	nodeCreate   
   background
   bind:this={myref}
 />
