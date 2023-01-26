@@ -26,6 +26,11 @@
       lastLength = currentLength;
       if(lastNode && !('clickCallback' in lastNode)){
         lastNode['clickCallback'] = handleClick;
+        
+        // toggle the border
+        lastNode['borderRadius'] == undefined ? 
+            lastNode['borderRadius'] = 550 : 
+              delete lastNode['borderRadius']
         nodesStore.set($nodesStore); // EditModal.svelte:34 ???
       }
     }
