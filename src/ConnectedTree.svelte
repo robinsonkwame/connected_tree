@@ -1,27 +1,84 @@
 <script>
-    import Svelvet from "svelvet";
+	import Svelvet from "svelvet";
+  import { coreSvelvetStore } from "svelvet/stores/store";
 
-    const initialNodes = [
-      {
-        id: 1,
-        position: { x: 10, y: 10 },
-        data: { label: "default styling" },
-        width: 150,
-        height: 40,
-        bgColor: "white"
-      }
-    ];
+  let startX = -200;
+  let startY = -200;
+  let offset = 100;
+  let myref;
+
+  const {
+      nodesStore,
+      nodeIdSelected,
+      deleteNode
+    } = coreSvelvetStore;
+  // from https://github.com/open-source-labs/Svelvet/NPM%20Package/svelvet/Nodes/EditModal.svelte
+  $: currentNode = $nodesStore.filter(n => n.id === $nodeIdSelected)[0];
+
+  function introspect(item){
+    console.log('\t about to introspect')
+    if(item){
+      for (var prop in item) {
+                console.log(prop + ' = ' + item[prop]);
+                if("object" == typeof(item[prop])){
+                  for (var prop2 in item[prop]) {
+                    console.log(
+                      "\t", 
+                      prop2 + ' = ' + 
+                      ("function" == typeof(item[prop][prop2]) ? '(func)' : item[prop][prop2]));
+                  }
+                };
+            }      
+    }
+  }
+
+  const toggleBorder = (e) => {
+    const currentNode = $nodesStore.filter(n => n.id === $nodeIdSelected)[0]
+    'borderRadius' in currentNode ? 
+      delete currentNode['borderRadius'] : currentNode['borderRadius'] = 550;
+    nodesStore.set($nodesStore); // EditModal.svelte:34 ???
+  }
+
+  const toggleShape = (e) => {
+    toggleBorder(e);
+    // ... maybe prefix label with Process: <label>?
+  }
+
+  const handleClick = (e) => {
+    toggleShape(e);
+  };
+
+	const initialNodes = [
+	  {
+	    id: 1,
+	    position: { x: startX, y: startY },
+	    data: { label: "Input Node" },
+	    width: 175,
+	    height: 40,
+	    bgColor: "white",
+      clickCallback: handleClick
+	  },
+	  {
+	    id: 2,
+	    position: { x: startX+offset, y: startY+offset },
+	    data: { label: "Default Node" },
+	    width: 175,
+	    height: 40,
+	    bgColor: "white",
+      borderRadius: 50,
+      clickCallback: handleClick
+	  }
+	];
+
+	const initialEdges = [
+	  { id: "e1-2", source: 1, target: 2, label: "edge label" }
+	];
 </script>
 
 <Svelvet 
-height={500}
-width={500} 
-nodes={initialNodes} 
-initialZoom={4} 
-initialLocation={initialNodes[0].position} 
-nodeLink 
-nodeCreate 
-nodeEdit
-background
-shareable
+  nodes={initialNodes} 
+  edges={initialEdges}
+  nodeEdit
+  background
+  bind:this={myref}
 />
