@@ -5,15 +5,22 @@
   let startX = -200;
   let startY = -200;
   let offset = 100;
+
+  let yOffset = 50;
   let myref;
 
   let lastLength = 0;
+  let lastEdgeLength = 0;
 
   const {
       nodesStore,
-      nodeIdSelected
+      nodeIdSelected,
+      edgesStore
     } = coreSvelvetStore;
   // from https://github.com/open-source-labs/Svelvet/NPM%20Package/svelvet/Nodes/EditModal.svelte
+
+  let sourceNode;
+
   $: currentNode = $nodesStore.filter(n => n.id === $nodeIdSelected)[0];
 
   // retroactively add click handler to new nodes
@@ -35,6 +42,20 @@
       }
     }
   })();
+
+$: $edgesStore, (() => {
+  const currentLength = $edgesStore.length - 1;
+  const lastEdge = $edgesStore[currentLength]
+
+  if (lastEdgeLength < currentLength){
+    if($edgesStore[currentLength].target == undefined){
+        $edgesStore[currentLength].targetY = $edgesStore[currentLength].sourceY + yOffset;
+    }
+    if($edgesStore[currentLength].source == undefined){
+        $edgesStore[currentLength].sourceY = $edgesStore[currentLength].targetY - yOffset;
+    }
+  }
+})();
 
   function introspect(item){
     console.log('\t about to introspect')
