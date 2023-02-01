@@ -88,6 +88,7 @@ $: $edgesStore, (() => {
 
   const handleClick = (e) => {
     toggleShape(e);
+    debugger;
   };
 
 	const initialNodes = [
@@ -122,7 +123,8 @@ $: $edgesStore, (() => {
   edges={initialEdges}
   nodeEdit
 	nodeLink 
-	nodeCreate   
+	nodeCreate
+  deleteNodes   
   background
   bind:this={myref}
 />
